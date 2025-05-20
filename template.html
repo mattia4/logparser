@@ -1,0 +1,219 @@
+<html>
+
+<head>
+    <meta charset="UTF-8">
+    <title>Log Table</title>
+    <style>
+        body {
+            font-family: Arial, sans-serif;
+            padding: 20px;
+        }
+
+        table {
+            border-collapse: collapse;
+            width: 100%;
+        }
+
+        th,
+        td {
+            border: 1px solid #ddd;
+            padding: 8px;
+        }
+
+        th {
+            background-color: #f2f2f2;
+        }
+
+        #searchInput {
+            margin-bottom: 12px;
+            padding: 8px;
+            width: 100%;
+        }
+
+        .page-btn {
+            padding: 8px 12px;
+            margin: 5px;
+            cursor: pointer;
+        }
+
+        .hidden {
+            display: none;
+        }
+
+        .checkboxes {
+            margin: 10px 0;
+        }
+
+        .pagination {
+            display: flex;
+            justify-content: center;
+        }
+
+        .pagination_number {
+            width: auto;
+
+            background-color: #fff;
+            padding: 15px;
+            border-radius: 8px;
+            box-shadow: 0 4px 8px rgba(0, 0, 0, 0.1);
+
+            white-space: nowrap;
+            overflow-x: auto;
+            -webkit-overflow-scrolling: touch;
+
+            &::-webkit-scrollbar {
+                display: none;
+            }
+
+            scrollbar-width: none;
+        }
+    </style>
+</head>
+
+<body>
+
+    <h2>Logs</h2>
+    <input type="text" id="searchInput" onkeyup="filterArrayBySearchTerm()" placeholder="filter logs...">
+    <table id="logTable">
+        <thead>
+            <tr>
+                <th>Data</th>
+                <th>Time</th>
+                <th>Log level</th>
+                <th>Process</th>
+                <th>PID</th>
+                <th>Message</th>
+            </tr>
+        </thead>
+        <tbody id="logTableRows"> </tbody>
+    </table>
+
+
+    <div id="pagination_number" class="pagination_number">
+
+    </div>
+
+    <div id="pagination" class="pagination">
+        <button class="page-btn" onclick="changePage(-1)">Previous</button>
+        <button class="page-btn" onclick="changePage(1)">Next</button>
+    </div>
+
+    <script>
+
+        const rowsPerPage = 100;
+        let currentPage = 1;
+        const allRows = JSON.parse(`{{.LogsJSON}}`);
+        let filteredRows = [...allRows];
+
+        function changePage(direction) {
+            const totalPages = Math.ceil(allRows.length / rowsPerPage);
+            currentPage = Math.min(Math.max(currentPage + direction, 1), totalPages);
+            renderTable();
+        }
+
+        function renderTable() {
+            const tableBody = document.getElementById('logTableRows');
+            tableBody.innerHTML = '';
+
+            const startIdx = (currentPage - 1) * rowsPerPage;
+            const endIdx = Math.min(currentPage * rowsPerPage, filteredRows.length);
+            const visibleRows = filteredRows.slice(startIdx, endIdx);
+
+            visibleRows.forEach(row => {
+                const rowElement = document.createElement('tr');
+
+                rowElement.innerHTML = `
+                <td>${row.Date}</td>
+                <td>${row.Time}</td>
+                <td>${row.Level}</td>
+                <td>${row.Tag}</td>
+                <td>${row.PID}</td>
+                <td>${row.Message}</td>
+            `;
+                tableBody.appendChild(rowElement);
+            });
+
+            renderPagination()
+        }
+
+        function filterTable() {
+            const input = document.getElementById("searchInput");
+            const filter = input.value.toLowerCase();
+
+            if (filter == "") {
+                filteredRows = allRows
+                currentPage = 1;
+                renderTable();
+                return;
+            }
+
+            filteredRows = allRows.filter(row => {
+                return
+                row.Date.toLowerCase().includes(filter) ||
+                    row.Level.toLowerCase().includes(filter) ||
+                    row.Message.toLowerCase().includes(filter) ||
+                    row.PID.toLowerCase().includes(filter) ||
+                    row.Tag.toString().includes(filter) ||
+                    row.Time.toLowerCase().includes(filter)
+            });
+
+            currentPage = 1;
+            renderTable();
+
+        }
+
+        function renderPagination() {
+            const pagination = document.getElementById('pagination_number');
+            pagination.innerHTML = '';
+            const totalPages = Math.ceil(filteredRows.length / rowsPerPage);
+
+            for (let i = 1; i <= totalPages; i++) {
+                const btn = document.createElement('button');
+                btn.className = 'page-btn';
+                btn.innerText = i;
+                btn.onclick = () => {
+                    currentPage = i;
+                    renderTable();
+                };
+                if (i === currentPage) btn.style.fontWeight = 'bold';
+                pagination.appendChild(btn);
+            }
+        }
+
+        function filterArrayBySearchTerm() {
+
+            const input = document.getElementById("searchInput");
+            const filter = input.value.toLowerCase();
+
+
+            if (filter == "") {
+                filteredRows = allRows
+                currentPage = 1;
+                renderTable();
+                return;
+            }
+
+
+            filteredRows = allRows.filter(item => {
+                for (const key in item) {
+                    if (Object.prototype.hasOwnProperty.call(item, key)) {
+                        const value = item[key];
+
+                        if (typeof value === 'string') {
+                            if (value.toLowerCase().includes(filter)) {
+                                return true;
+                            }
+                        }
+                    }
+                }
+            });
+            currentPage = 1;
+            renderTable();
+        }
+
+        renderTable();
+
+    </script>
+</body>
+
+</html>
