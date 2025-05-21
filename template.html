@@ -244,7 +244,7 @@
             const colPositions = {
                 date: { x: 14, width: 20 },
                 time: { x: 34, width: 30 },
-                process: { x: 64, width: 28 },
+                tag: { x: 64, width: 28 },
                 pid: { x: 94, width: 18 },
                 level: { x: 114, width: 18 },
                 message: { x: 134, width: 65 }
@@ -252,36 +252,37 @@
 
             filteredRows.forEach((row) => {
                 let currentMaxRowHeight = lineHeight;
-
                 const date = String(row.Date || "");
                 const time = String(row.Time || "");
-                const process = String(row.Process || "");
+                const tag = String(row.Tag || "");
                 const pid = String(row.PID || "");
                 const level = String(row.Level || "");
                 const message = String(row.Message || "");
 
                 const splitMessage = doc.splitTextToSize(message, colPositions.message.width);
+                const splitTag = doc.splitTextToSize(tag, colPositions.tag.width);
                 const messageHeight = splitMessage.length * lineHeight;
-                currentMaxRowHeight = Math.max(currentMaxRowHeight, messageHeight);
+                const processHeight = splitTag.length * lineHeight;
+                currentMaxRowHeight = Math.max(currentMaxRowHeight, messageHeight, processHeight);
 
                 if (y + currentMaxRowHeight > maxY) {
                     doc.addPage();
                     y = startY;
 
                     doc.setFont(undefined, 'bold');
-                    doc.text("Data", colPositions.date.x, y);
-                    doc.text("Ora", colPositions.time.x, y);
-                    doc.text("Processo", colPositions.process.x, y);
+                    doc.text("Date", colPositions.date.x, y);
+                    doc.text("Time", colPositions.time.x, y);
+                    doc.text("Tag", colPositions.tag.x, y);
                     doc.text("PID", colPositions.pid.x, y);
-                    doc.text("Livello", colPositions.level.x, y);
-                    doc.text("Messaggio", colPositions.message.x, y);
+                    doc.text("Log level", colPositions.level.x, y);
+                    doc.text("Message", colPositions.message.x, y);
                     doc.setFont(undefined, 'normal');
                     y += lineHeight + 2;
                 }
 
                 doc.text(date, colPositions.date.x, y);
                 doc.text(time, colPositions.time.x, y);
-                doc.text(process, colPositions.process.x, y);
+                doc.text(splitTag, colPositions.tag.x, y);
                 doc.text(pid, colPositions.pid.x, y);
                 doc.text(level, colPositions.level.x, y);
                 doc.text(splitMessage, colPositions.message.x, y);
@@ -289,7 +290,7 @@
                 y += currentMaxRowHeight;
             });
 
-            await doc.save("lowg_filtrati.pdf");
+            await doc.save("log_filtrati.pdf");
         }
 
     </script>
