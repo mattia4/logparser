@@ -4,55 +4,76 @@ import (
 	"bufio"
 	"encoding/json"
 	"html/template"
+	logger "logparser/logger"
 	"logparser/models"
-	"logparser/utils"
+	p "logparser/parser"
+	pm "logparser/parser/models"
+	_ "logparser/parser/types"
+	logparser_template "logparser/template"
+	logparser_utils "logparser/utils"
 	"os"
+	"path/filepath"
 )
 
 func main() {
+	logger := logger.NewLogger(true)
+
 	file, err := os.Open("logs.txt")
 	if err != nil {
 		panic(err)
 	}
 	defer file.Close()
 
-	var logs []models.LogEntry
+	var logs []pm.LogEntry
 	scanner := bufio.NewScanner(file)
 
 	for scanner.Scan() {
 		line := scanner.Text()
 
-		entry := utils.ParseLogLine(line)
+		parsers := pm.RegisteredParsers
+		parsedEntry := p.ParseLogLine(line, parsers)
+		logs = append(logs, parsedEntry)
 
-		if entry != nil {
-			logs = append(logs, *entry)
-		}
 	}
 
-	htmlFile, err := os.ReadFile("template.html")
+	htmlFile, err := os.ReadFile(logparser_template.GetHtmlTemplatePath())
 	if err != nil {
 		panic(err)
 	}
 
-	tmpl, err := template.New("log").Parse(string(htmlFile))
+	htmlTemplate, err := template.New("log").Parse(string(htmlFile))
 	if err != nil {
 		panic(err)
 	}
 
-	jsonBytes, err := json.Marshal(logs)
+	htmlBytes, err := json.Marshal(logs)
 	if err != nil {
 		panic(err)
 	}
 
 	rows := models.TemplateData{
-		LogsJSON: template.JS(jsonBytes),
+		LogsJSON: template.JS(htmlBytes),
 	}
 
-	out, err := os.Create("logs.html")
+	if err := logparser_utils.CreateDir(logparser_template.GetOutputDir()); err != nil {
+		logger.Fatal("Error in creating directory %s: %v", logparser_template.GetOutputDir(), err)
+	}
+
+	logsHtmlOut, err := os.Create(filepath.Join(logparser_template.GetOutputDir(), "logs.html"))
 	if err != nil {
 		panic(err)
 	}
-	defer out.Close()
+	defer logsHtmlOut.Close()
 
-	tmpl.Execute(out, rows)
+	htmlTemplate.Execute(logsHtmlOut, rows)
+
+	err = logparser_utils.CopyFile(logparser_template.GetCssTemplatePath(), filepath.Join(logparser_template.GetOutputDir(), "template.css"))
+	if err != nil {
+		logger.Fatal("Error in creating template.css: %v", err)
+	}
+
+	err = logparser_utils.CopyFile(logparser_template.GetJsTemplatePath(), filepath.Join(logparser_template.GetOutputDir(), "template.js"))
+	if err != nil {
+		logger.Fatal("Error in creating template.js: %v", err)
+	}
 }
