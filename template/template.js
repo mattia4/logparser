@@ -53,8 +53,7 @@ function filterTable() {
     }
 
     filteredRows = allRows.filter(row => {
-        return
-        row.Date.toLowerCase().includes(filter) ||
+        return row.Date.toLowerCase().includes(filter) ||
             row.Level.toLowerCase().includes(filter) ||
             row.Message.toLowerCase().includes(filter) ||
             row.PID.toLowerCase().includes(filter) ||
