@@ -13,9 +13,10 @@ var reAndroid = regexp.MustCompile(reAndroidLogcat)
 var androidLogParser = m.LogParser{
 	Name:  tagAndroid,
 	Regex: reAndroid,
-	ParseFn: func(matches []string) m.LogEntry {
+	ParseFn: func(matches []string, rawLine string) m.LogResult {
 		date, time, pid, tid, level, tag, message := matches[1], matches[2], matches[3], matches[4], matches[5], matches[6], matches[7]
-		return m.LogEntry{
+
+		res := m.LogEntry{
 			FormatTag: tagAndroid,
 			Date:      &date,
 			Time:      &time,
@@ -24,6 +25,12 @@ var androidLogParser = m.LogParser{
 			Level:     &level,
 			Tag:       &tag,
 			Message:   &message,
+		}
+
+		return m.LogResult{
+			RawLine:    rawLine,
+			FormatTag:  tagAndroid,
+			ParsedData: res,
 		}
 	},
 }

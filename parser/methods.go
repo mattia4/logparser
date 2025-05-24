@@ -4,19 +4,15 @@ import (
 	m "logparser/parser/models"
 )
 
-func ParseLogLine(line string, parsers []m.LogParser) m.LogEntry {
+func ParseLogLine(line string, parsers []m.LogParser) m.LogResult {
 
 	for _, p := range parsers {
 		matches := p.Regex.FindStringSubmatch(line)
 
 		if len(matches) > 0 {
-			entry := p.ParseFn(matches)
-			entry.RawLine = line
-			return entry
+			return p.ParseFn(matches, line)
 		}
 
 	}
-
-	return m.LogEntry{RawLine: line}
-
+	return m.LogResult{RawLine: line, FormatTag: "Unrecognized"}
 }

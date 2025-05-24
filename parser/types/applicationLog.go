@@ -13,14 +13,21 @@ var reApplication = regexp.MustCompile(applicationLogcatRegex)
 var applicationLogParser = m.LogParser{
 	Name:  tagApplication,
 	Regex: reApplication,
-	ParseFn: func(matches []string) m.LogEntry {
+	ParseFn: func(matches []string, rawLine string) m.LogResult {
 		date, time, level, message := matches[1], matches[2], matches[3], matches[4]
-		return m.LogEntry{
-			FormatTag: tagApplication,
+
+		res := m.LogEntry{
+			FormatTag: tagAnotherApplication,
 			Date:      &date,
 			Time:      &time,
 			Level:     &level,
 			Message:   &message,
+		}
+
+		return m.LogResult{
+			RawLine:    rawLine,
+			FormatTag:  tagAndroid,
+			ParsedData: res,
 		}
 	},
 }

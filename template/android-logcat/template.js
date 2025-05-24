@@ -1,4 +1,3 @@
-
 const rowsPerPage = 100;
 let currentPage = 1;
 let filteredRows = [];
@@ -24,10 +23,13 @@ function renderTable() {
     const endIdx = Math.min(currentPage * rowsPerPage, filteredRows.length);
     const visibleRows = filteredRows.slice(startIdx, endIdx);
 
-    visibleRows.forEach(row => {
-        const rowElement = document.createElement('tr');
+    visibleRows.forEach(r => {
 
-        rowElement.innerHTML = `
+        var row = r.ParsedData
+
+        if (row != null) {
+            const rowElement = document.createElement('tr');
+            rowElement.innerHTML = `
                 <td class="date">${row.Date}</td>
                 <td class="time">${row.Time}</td>
                 <td class="level">${row.Level}</td>
@@ -35,7 +37,9 @@ function renderTable() {
                 <td class="pid">${row.PID}</td>
                 <td class="message">${row.Message}</td>
             `;
-        tableBody.appendChild(rowElement);
+            tableBody.appendChild(rowElement);
+        }
+
     });
 
     renderPagination()
@@ -152,7 +156,9 @@ async function exportToPDF() {
         message: { x: 134, width: 65 }
     };
 
-    filteredRows.forEach((row) => {
+    filteredRows.forEach((r) => {
+        var row = r.ParsedData
+
         let currentMaxRowHeight = lineHeight;
         const date = String(row.Date || "");
         const time = String(row.Time || "");
