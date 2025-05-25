@@ -2,7 +2,7 @@ package types
 
 import (
 	m "logparser/parser/models"
-	utils "logparser/utils"
+	utils_date "logparser/utils/date"
 	"regexp"
 )
 
@@ -20,8 +20,9 @@ var logParserOp = m.LogParser{
 		timestampStr := matches[3]
 		message := matches[4]
 		statusCode := matches[5]
-		parsedDate := utils.ParseApacheDate(timestampStr)
-		parsedTime := utils.ParseApacheTime(timestampStr)
+
+		parsedDate := utils_date.ParseApacheDate(timestampStr)
+		parsedTime := utils_date.ParseApacheTime(timestampStr)
 
 		accessLogEntry := m.AccessLogEntry{
 			RawLine:    rawLine,
@@ -33,10 +34,20 @@ var logParserOp = m.LogParser{
 			StatusCode: statusCode,
 		}
 
+		cols := []m.ColTemplate{
+			{Name: "Site", Value: "Site"},
+			{Name: "IPAddress", Value: "IP Address"},
+			{Name: "Date", Value: "Date"},
+			{Name: "Time", Value: "Time"},
+			{Name: "Message", Value: "Message"},
+			{Name: "StatusCode", Value: "StatusCode"},
+		}
+
 		return m.LogResult{
 			RawLine:    rawLine,
 			FormatTag:  tagOp,
 			ParsedData: accessLogEntry,
+			Cols:       cols,
 		}
 	},
 }

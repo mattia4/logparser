@@ -6,7 +6,7 @@ import (
 )
 
 const tagAndroid = "AndroidLogcat"
-const reAndroidLogcat = `^(\d{2}-\d{2})\s+(\d{2}:\d{2}:\d{2}\.\d{3})\s+(\d+)-(\d+)(?:\/[^ ]+)?\s+([VDIWEF])\/([^:]+)\s*:\s*(.*)$`
+const reAndroidLogcat = `^(?<date>\d{2}-\d{2})\s+(?<time>\d{2}:\d{2}:\d{2}\.\d{3})\s+(?<pid>\d+)\s+(?<tid>\d+)\s+(?<level>[VDIWEA])\s+(?<tag>[^:]+):\s*(?<message>.*)$`
 
 var reAndroid = regexp.MustCompile(reAndroidLogcat)
 
@@ -20,17 +20,28 @@ var androidLogParser = m.LogParser{
 			FormatTag: tagAndroid,
 			Date:      &date,
 			Time:      &time,
-			PID:       &pid,
-			TID:       &tid,
+			Pid:       &pid,
+			Tid:       &tid,
 			Level:     &level,
 			Tag:       &tag,
 			Message:   &message,
+		}
+
+		cols := []m.ColTemplate{
+			{Name: "Date", Value: "Date"},
+			{Name: "Time", Value: "Time"},
+			{Name: "Pid", Value: "PID"},
+			{Name: "Tid", Value: "TID"},
+			{Name: "Level", Value: "Level"},
+			{Name: "Tag", Value: "Tag"},
+			{Name: "Message", Value: "Message"},
 		}
 
 		return m.LogResult{
 			RawLine:    rawLine,
 			FormatTag:  tagAndroid,
 			ParsedData: res,
+			Cols:       cols,
 		}
 	},
 }
