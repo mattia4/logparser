@@ -24,10 +24,18 @@ var anotherApplicationLogParser = m.LogParser{
 			Message:   &message,
 		}
 
+		cols := []m.ColTemplate{
+			{Name: "Date", Value: "Date"},
+			{Name: "Time", Value: "Time"},
+			{Name: "Level", Value: "Level"},
+			{Name: "Message", Value: "Message"},
+		}
+
 		return m.LogResult{
 			RawLine:    rawLine,
 			FormatTag:  tagAndroid,
 			ParsedData: res,
+			Cols:       cols,
 		}
 	},
 }

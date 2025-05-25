@@ -9,8 +9,8 @@ type LogEntry struct {
 	FormatTag   string
 	Date        *string
 	Time        *string
-	PID         *string
-	TID         *string
+	Pid         *string
+	Tid         *string
 	Level       *string
 	Tag         *string
 	Message     *string
@@ -31,6 +31,17 @@ type LogResult struct {
 	RawLine    string
 	FormatTag  string
 	ParsedData interface{}
+	Cols       []ColTemplate
+}
+
+type Result struct {
+	LogResult []LogResult
+	Cols      []ColTemplate
+}
+
+type ColTemplate struct {
+	Name  string
+	Value string
 }
 
 type LogParser struct {
