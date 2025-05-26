@@ -5,18 +5,18 @@ import (
 	"regexp"
 )
 
-const tagAndroidAlt1 = "AndroidLogcatAlt1"
-const reAndroidLogcatAlt1 = `(?P<Date>\d{2}-\d{2}) (?P<Time>\d{2}:\d{2}:\d{2}\.\d{3}) (?P<PID>\d+)-(?P<TID>\d+)/[^\s]+ (?P<Level>[A-Z])/(?P<Tag>[^:]+): (?P<Message>.+)`
+const tagAndroid = "AndroidLog"
+const reAndroidLog = `^(?<date>\d{2}-\d{2})\s+(?<time>\d{2}:\d{2}:\d{2}\.\d{3})\s+(?<pid>\d+)\s+(?<tid>\d+)\s+(?<level>[VDIWEA])\s+(?<tag>[^:]+):\s*(?<message>.*)$`
 
-var reAndroidAlt1 = regexp.MustCompile(reAndroidLogcatAlt1)
+var reAndroid = regexp.MustCompile(reAndroidLog)
 
-var androidLogParserAlt1 = m.LogParser{
-	Name:  tagAndroidAlt1,
-	Regex: reAndroidAlt1,
+var androidLogParser = m.LogParser{
+	Name:  tagAndroid,
+	Regex: reAndroid,
 	ParseFn: func(matches []string, rawLine string) m.LogResult {
 		date, time, pid, tid, level, tag, message := matches[1], matches[2], matches[3], matches[4], matches[5], matches[6], matches[7]
 
-		res := m.LogEntry{
+		res := m.AndroidLogEntry{
 			FormatTag: tagAndroid,
 			Date:      &date,
 			Time:      &time,
@@ -30,6 +30,8 @@ var androidLogParserAlt1 = m.LogParser{
 		cols := []m.ColTemplate{
 			{Name: "Date", Value: "Date"},
 			{Name: "Time", Value: "Time"},
+			{Name: "Pid", Value: "PID"},
+			{Name: "Tid", Value: "TID"},
 			{Name: "Level", Value: "Level"},
 			{Name: "Tag", Value: "Tag"},
 			{Name: "Message", Value: "Message"},
@@ -45,5 +47,5 @@ var androidLogParserAlt1 = m.LogParser{
 }
 
 func init() {
-	m.RegisteredParsers = append(m.RegisteredParsers, androidLogParserAlt1)
+	m.RegisteredParsers = append(m.RegisteredParsers, androidLogParser)
 }
