@@ -1,5 +1,5 @@
 # Node.js
-/frontend/node_modules/s
+/frontend/node_modules/
 
 #  output del fe (generated from esbuild)
 /dist/
