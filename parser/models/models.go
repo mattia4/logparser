@@ -29,13 +29,13 @@ type AccessLogEntry struct {
 type AndroidLogEntry struct {
 	RawLine     string
 	FormatTag   string
-	Date        *string
-	Time        *string
-	Pid         *string
-	Tid         *string
-	Level       *string
-	Tag         *string
-	Message     *string
+	Date        string
+	Time        string
+	Pid         string
+	Tid         string
+	Level       string
+	Tag         string
+	Message     string
 	OtherFields map[string]string
 }
 
@@ -48,8 +48,6 @@ type SyslogEntry struct {
 	Process  string
 	Message  string
 }
-
-type JsonLogEntry map[string]interface{}
 
 type WindowsEventEntry struct {
 	RawLine   string

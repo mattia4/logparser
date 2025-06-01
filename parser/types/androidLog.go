@@ -18,13 +18,13 @@ var androidLogParser = m.LogParser{
 
 		res := m.AndroidLogEntry{
 			FormatTag: tagAndroid,
-			Date:      &date,
-			Time:      &time,
-			Pid:       &pid,
-			Tid:       &tid,
-			Level:     &level,
-			Tag:       &tag,
-			Message:   &message,
+			Date:      date,
+			Time:      time,
+			Pid:       pid,
+			Tid:       tid,
+			Level:     level,
+			Tag:       tag,
+			Message:   message,
 		}
 
 		cols := []m.ColTemplate{

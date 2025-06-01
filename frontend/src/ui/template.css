@@ -65,7 +65,6 @@
 
         #searchInput {
             width: 100%;
-            max-width: 400px;
             padding: 0.75rem 1rem;
             border: 1px solid #cbd5e0;
             border-radius: 0.5rem;
@@ -83,7 +82,6 @@
         }
 
         #logTable {
-            width: 100%;
             max-width: fit-content;
             border-collapse: separate;
             border-spacing: 0;
@@ -161,12 +159,13 @@
             margin-top: 1.5rem;
         }
 
-        .pagination_number {
+        .page-number {
             font-size: 1rem;
             font-weight: 500;
             color: #475569;
-            margin-bottom: 0.75rem;
+            margin: 0.75rem;
             text-align: center;
+            cursor: pointer;
         }
 
         .pagination .page-btn {
@@ -278,12 +277,25 @@
             visibility: visible;
         }
 
+        .show-element {
+            visibility: visible;
+            opacity: 1;
+            transition: opacity 0.3s ease-in-out;
+        }
+
+        .hide-element {
+            visibility: hidden;
+            opacity: 0;
+            transition: opacity 0.3s ease-in-out;
+        }
+
         .spinner {
             border: 5px solid #e2e8f0;
             border-top: 5px solid #3b82f6;
             border-radius: 50%;
             width: 50px;
             height: 50px;
+            margin-right: 10px;
             animation: spin 1s linear infinite;
         }
 
@@ -329,10 +341,6 @@
             #btn-export-pdf {
                 width: 100%;
                 margin-top: 0.5rem;
-            }
-
-            #searchInput {
-                max-width: 100%;
             }
 
             #logTable th,
