@@ -9,10 +9,12 @@
 
 <body>
 
-    <h2>Logs <button id="btn-export-pdf" onclick="exportToPDF()"> Export PDF </button> </h2>
+    <h2>Logs <button id="btn-export-pdf"> Export PDF </button> </h2>
 
     <div id="log-section">
         <input type="text" id="searchInput" onkeyup="filterArrayBySearchTerm()" placeholder="filter logs...">
+
+        <div id="spawnFilters"> </div>
 
         <table id="logTable">
             <thead>
@@ -50,7 +52,7 @@
         <div class="spinner"></div>
     </div>
 
-    <script src="template.js"></script>
+    <script type="module" src="template.js"></script>
     <script src="logs_data.js" defer></script>
 </body>
 

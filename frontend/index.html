@@ -1,0 +1,41 @@
+<!DOCTYPE html>
+<html lang="it"> <head>
+    <meta charset="UTF-8">
+    <meta name="viewport" content="width=device-width, initial-scale=1.0"> <title>Log Table</title>
+    <script src="https://cdnjs.cloudflare.com/ajax/libs/jspdf/2.5.1/jspdf.umd.min.js"></script>
+    <link rel="stylesheet" href="template.css">
+</head>
+
+<body>
+
+    <h2>Logs <button id="btn-export-pdf"> Esporta PDF </button> </h2> <div id="log-section">
+        <input type="text" id="searchInput" placeholder="Search ...">
+
+        <div id="spawnFilters"> </div>
+
+        <table id="logTable">
+            <thead>
+                <tr id="trSpawnColums"></tr>
+            </thead>
+            <tbody id="logTableRows"> </tbody>
+        </table>
+
+        <div id="pagination-numbers" class="pagination-numbers"> </div>
+
+        <div id="pagination" class="pagination">
+            <button class="page-btn" id="prevPageBtn">Precedente</button>
+            <button class="page-btn" id="nextPageBtn">Successivo</button>
+        </div>
+    </div>
+
+    <div id="output"></div> 
+
+    <div id="loadingSpinner" class="loading-overlay">
+        <div class="spinner"></div>
+        <p>Loading ...</p> </div>
+
+    
+    <script type="module" src="main.js"></script>
+</body>
+
+</html>

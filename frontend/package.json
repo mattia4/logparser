@@ -1,0 +1,21 @@
+{
+    "name": "logger",
+    "version": "1.0.0",
+    "description": "",
+    "main": "index.js",
+    "directories": {
+        "lib": "lib"
+    },
+    "scripts": {
+        "dev": "node esbuild.config.js --watch",
+        "build": "node esbuild.config.js",
+        "start": "npm run build && go run ../main.go ../"
+    },
+    "keywords": [],
+    "author": "",
+    "license": "ISC",
+    "devDependencies": {
+        "esbuild": "^0.25.5",
+        "parcel": "^2.15.2"
+    }
+}

@@ -1,3 +1,4 @@
+import { exportToPDF } from './pdf-utils.js';
 
 const rowsPerPage = 100;
 let currentPage = 1;
@@ -9,11 +10,7 @@ let logSection;
 let dropFileSection;
 let btnExportPdf;
 let loadingSpinner;
-
-function init() {
-    generateTableColumns(allColumns)
-    renderTable();
-}
+const activeColumnFilters = {};
 
 document.addEventListener("DOMContentLoaded", () => {
     const fileInput = document.getElementById('jsonFileInput');
@@ -47,6 +44,19 @@ document.addEventListener("DOMContentLoaded", () => {
         dropZone.classList.remove('dragover');
         handleFiles(event.dataTransfer.files);
     });
+
+
+
+    const generatePdfButton = document.getElementById('generate-pdf-button');
+
+    if (generatePdfButton) {
+        generatePdfButton.addEventListener('click', () => {
+            const dataToInclude = {
+                activeFilters: activeColumnFilters,
+            };
+            exportToPDF(dataToInclude, 'Log_Report_2025');
+        });
+    }
 });
 
 function handleFiles(files) {
@@ -75,12 +85,13 @@ function handleFiles(files) {
             allColumns = logsData.Cols;
 
             searchInput.addEventListener("input", filterArrayBySearchTerm);
+            generateTableColumns(allColumns)
 
-            init(logsData);
+            renderTable();
             hideSpinner()
 
         } catch (err) {
-            output.textContent = "Errore nel parsing del file: " + err.message;
+            output.textContent = "Parse error: " + err.message;
         }
     };
 
@@ -103,14 +114,39 @@ function generateTableColumns(allColumns) {
     var colsSpawn = document.getElementById("trSpawnColums");
 
     for (const key in allColumns) {
+        const div = document.createElement('div')
+        div.className = "div-filter-col"
         const thElement = document.createElement('th');
 
-        thElement.textContent = allColumns[key].Value;
+        const input = document.createElement('input');
+        input.type = 'text';
+        input.name = 'filter-' + allColumns[key].Name.toLowerCase();
+        input.placeholder = allColumns[key].Name.toLowerCase();
+        input.id = 'filter-' + allColumns[key].Name.toLowerCase();
 
+        input.addEventListener('input', function (event) {
+            const inputElement = event.target;
+            const columnName = inputElement.value;
+
+            updateColumnFilter(allColumns[key].Name, columnName)
+        });
+
+        thElement.textContent = allColumns[key].Value;
         thElement.className = allColumns[key].Value.toLowerCase();
 
         colsSpawn.appendChild(thElement);
+        thElement.appendChild(div);
+        div.appendChild(input);
+
     }
+}
+function updateColumnFilter(columnName, filterValue) {
+    if (filterValue) {
+        activeColumnFilters[columnName] = filterValue;
+    } else {
+        delete activeColumnFilters[columnName];
+    }
+
 }
 
 function renderTable() {
@@ -126,22 +162,19 @@ function renderTable() {
 
     visibleRows.forEach(r => {
         const rowElement = document.createElement('tr');
-
         var row = r.ParsedData
         if (row != null && r.Cols != null) {
             r.Cols.forEach(col => {
                 var value = row[col.Name]
                 if (searchedText != "") {
-                    rowElement.innerHTML += `<td class="date">${highlightText(value, searchedText)}</td>`;
+                    rowElement.innerHTML += `<td class="${value}">${highlightText(value, searchedText)}</td>`;
                 } else {
-                    rowElement.innerHTML += `<td class="date">${value}</td>`;
+                    rowElement.innerHTML += `<td class="${value}">${value}</td>`;
                 }
                 tableBody.appendChild(rowElement);
             })
         }
-
     });
-
     renderPagination()
 }
 
@@ -166,6 +199,25 @@ function renderPagination() {
     }
 }
 
+function filterCols() {
+    if (Object.keys(activeColumnFilters).length > 0) {
+        visibleRows.filter(logEntry => {
+            for (const colName in activeColumnFilters) {
+                const filterValue = activeColumnFilters[colName].toLowerCase();
+                const logEntryValue = String(logEntry[colName] || '').toLowerCase();
+                if (logEntryValue == filterValue) {
+                    return false;
+                }
+            }
+            return true;
+        });
+        renderPagination()
+    }
+
+    currentPage = 1;
+    renderTable();
+}
+
 function filterArrayBySearchTerm() {
 
     const input = document.getElementById("searchInput");
@@ -177,7 +229,6 @@ function filterArrayBySearchTerm() {
         renderTable();
         return;
     }
-
 
     filteredRows = allRows.filter(item => {
         for (const key in item) {
@@ -196,8 +247,6 @@ function filterArrayBySearchTerm() {
     renderTable();
 }
 
-renderTable();
-
 function highlightText(text, filter) {
     if (!filter || filter.trim() === '') {
         return text;
@@ -208,7 +257,7 @@ function highlightText(text, filter) {
     return text.replace(regex, '<span class="highlight">$&</span>');
 }
 
-
+/*
 async function exportToPDF() {
     const { jsPDF } = window.jspdf;
     const doc = new jsPDF();
@@ -304,7 +353,7 @@ async function exportToPDF() {
 
     await doc.save("filtered_logs.pdf");
 }
-
+*/
 function showSpinner() { loadingSpinner.classList.add('active'); }
 
 function hideSpinner() { loadingSpinner.classList.remove('active'); }
