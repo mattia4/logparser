@@ -82,14 +82,15 @@
         }
 
         #logTable {
-            max-width: fit-content;
-            border-collapse: separate;
+            table-layout: fixed;
+            width: 100%;
+
+            border-collapse: collapse;
             border-spacing: 0;
             margin-bottom: 1.5rem;
             border-radius: 0.75rem;
             overflow: hidden;
             box-shadow: 0 4px 6px -1px rgba(0, 0, 0, 0.1), 0 2px 4px -1px rgba(0, 0, 0, 0.06);
-            table-layout: fixed;
         }
 
         #logTable thead {
@@ -114,6 +115,10 @@
             border-right: none;
         }
 
+        .order_col_style {
+            cursor: pointer;
+        }
+
         #logTable tbody tr {
             background-color: #ffffff;
             transition: background-color 0.15s ease-in-out;
@@ -121,6 +126,24 @@
 
         #logTable tbody tr:nth-child(even) {
             background-color: #f8fafc;
+        }
+
+        .see-more {
+            text-align: end;
+            font-size: 0.7375rem;
+        }
+
+        .see-more:hover {
+            color: #0ea5e9;
+        }
+
+        p {
+            white-space: nowrap;
+            overflow: hidden;
+            text-overflow: ellipsis;
+            text-align: center;
+            align-content: center;
+            height: 50px;
         }
 
         #logTable tbody tr:hover {
@@ -131,8 +154,10 @@
             padding: 0.875rem 1.25rem;
             border-bottom: 1px solid #e2e8f0;
             border-right: 1px solid #e2e8f0;
+
             font-size: 0.9375rem;
             color: #475569;
+            cursor: pointer;
         }
 
         #logTable td:last-child {
@@ -236,26 +261,6 @@
             z-index: 10;
         }
 
-        .message {
-            margin-top: 1rem;
-            padding: 0.75rem 1rem;
-            border-radius: 0.5rem;
-            font-weight: 500;
-            font-size: 0.9375rem;
-        }
-
-        .message.success {
-            background-color: #dcfce7;
-            color: #16a34a;
-            border: 1px solid #86efac;
-        }
-
-        .message.error {
-            background-color: #fee2e2;
-            color: #dc2626;
-            border: 1px solid #fca5a5;
-        }
-
         .loading-overlay {
             position: fixed;
             top: 0;
@@ -352,10 +357,6 @@
             #log-section {
                 overflow-x: auto;
             }
-
-            #logTable {
-                min-width: 600px;
-            }
         }
 
         #spawnFilters {
@@ -363,7 +364,37 @@
             flex-direction: row;
         }
 
-        .div-filter-col {
+        .dialog-overlay {
+            position: fixed;
+            top: 0;
+            left: 0;
+            width: 100%;
+            height: 100%;
+            background-color: rgba(0, 0, 0, 0.5);
             display: flex;
-            flex-direction: column;
+            justify-content: center;
+            align-items: center;
+            z-index: 1000;
+        }
+
+        .dialog-content {
+            background-color: white;
+            padding: 30px;
+            border-radius: 8px;
+            box-shadow: 0 4px 15px rgba(0, 0, 0, 0.2);
+            text-align: center;
+            max-width: fit-content;
+            width: 90%;
+            transform: scale(0.9);
+            opacity: 0;
+            transition: transform 0.3s ease-out, opacity 0.3s ease-out;
+        }
+
+        .dialog-overlay.show .dialog-content {
+            transform: scale(1);
+            opacity: 1;
+        }
+
+        .dialog-overlay.hidden {
+            display: none;
         }
