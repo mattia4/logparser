@@ -1,9 +1,9 @@
-import { highlightText, filterArrayBySearchTerm, filterByColumns } from './table-functions.js';
-import { hideHtmlElement, resetVisibilityHtmlElements } from './helpers.js';
+import { highlightText, filterArrayBySearchTerm, filterByColumns, orderByCol } from './table-functions.js';
+import { hideHtmlElement, resetVisibilityHtmlElements, DivHelper } from './helpers.js';
 import { exportTableToPdf } from './pdf-utils.js';
+import { DialogComponent } from './dialog.js'
 
 let allLogs = [];
-let allData;
 let allCols = [];
 let filteredLogs = [];
 let currentPage = 1;
@@ -14,48 +14,72 @@ const logTableRows = document.getElementById('logTableRows');
 const trSpawnColums = document.getElementById('trSpawnColums');
 const searchInput = document.getElementById('searchInput');
 const paginationNumbers = document.getElementById('pagination-numbers');
+const pagination = document.getElementById('pagination');
 const prevPageBtn = document.getElementById('prevPageBtn');
 const nextPageBtn = document.getElementById('nextPageBtn');
 const btnExportPdf = document.getElementById('btn-export-pdf');
-const outputDiv = document.getElementById('output');
 
 hideHtmlElement(paginationNumbers)
 hideHtmlElement(pagination)
 
 function renderColumns(cols) {
     trSpawnColums.innerHTML = '';
-    cols.forEach(col => {
+    cols.forEach((col, index) => {
         const th = document.createElement('th');
-        //th.innerText = col.DisplayName;
 
-        const dr = document.createElement('div')
-        dr.classList.add('row')
-        dr.innerText = col.DisplayName;
+        let r = DivHelper.makeRow(null, {});
+        let c1 = DivHelper.makeCol(col.DisplayName, { class: 'col-auto' });
+        let c2 = DivHelper.makeCol("▼", { class: ['col-1', "order_" + index, 'order_col_style'] });
+
+        c2.addEventListener('click', () => {
+            let d = document.getElementsByClassName("order_" + index);
+            if (d[0].classList.contains("order_" + index) && !d[0].classList.contains("rot180deg")) {
+                d[0].classList.add('rot180deg');
+                orderBy(col, true);
+            } else if (d[0].classList.contains("order_" + index) && d[0].classList.contains("rot180deg")) {
+                d[0].classList.remove('rot180deg');
+                orderBy(col, false);
+            }
+        });
+
+        r.appendChild(c1)
+        r.appendChild(c2)
 
         const dr2 = document.createElement('div')
         dr2.classList.add('row')
 
         const input = document.createElement('input')
         input.type = "search"
+        input.placeholder = "Search...";
+        input.classList.add('search-input')
         dr2.appendChild(input)
+
         input.addEventListener('keyup', () => {
             if (input == null) return;
 
             searchFor(input.value.toLowerCase(), col.Name);
         });
 
-        th.appendChild(dr)
+        input.addEventListener('input', (event) => {
+            if (event.target.value === '') clearData(allLogs)
+        });
+
+        th.appendChild(r)
         th.appendChild(dr2)
         trSpawnColums.appendChild(th);
     });
 }
 
 function searchFor(searchedInput, colName) {
-    console.log(searchedInput, colName, allData);
     filteredLogs = filterByColumns(colName, allLogs, searchedInput);
-
     currentPage = 1;
     renderTable(filteredLogs);
+}
+
+function clearData(logs) {
+    filteredLogs = logs;
+    currentPage = 1;
+    renderTable(filteredLogs)
 }
 
 function renderTable(logsToRender) {
@@ -67,13 +91,34 @@ function renderTable(logsToRender) {
 
     paginatedLogs.forEach(logEntry => {
         const tr = document.createElement('tr');
+
         allCols.forEach(colDef => {
             const td = document.createElement('td');
+            const p = document.createElement('p');
+
+            const rowVal = DivHelper.makeRow("", {});
+            const rowActions = DivHelper.makeRow("", {});
+            const colActionSeeMore = DivHelper.makeCol("see more...", { class: 'see-more' });
+
             if (searchInput != null && searchInput.value.length != 0) {
-                td.innerHTML = logEntry[colDef.Name] !== undefined ? highlightText(logEntry[colDef.Name], searchInput.value) : '';
+                p.innerHTML = logEntry[colDef.Name] !== undefined ? highlightText(logEntry[colDef.Name], searchInput.value) : '';
             } else {
-                td.innerText = logEntry[colDef.Name] !== undefined ? logEntry[colDef.Name] : '';
+                p.innerText = logEntry[colDef.Name] !== undefined ? logEntry[colDef.Name] : '';
             }
+
+            colActionSeeMore.addEventListener('click', () => {
+                const resultDialog = new DialogComponent({
+                    title: colDef.DisplayName,
+                    content: p.innerHTML,
+                    onClose: () => { }
+                });
+                resultDialog.open();
+            });
+
+            rowVal.appendChild(p)
+            td.appendChild(rowVal);
+            rowActions.appendChild(colActionSeeMore);
+            td.appendChild(rowActions);
             tr.appendChild(td);
         });
         logTableRows.appendChild(tr);
@@ -82,9 +127,10 @@ function renderTable(logsToRender) {
     renderPaginationControls(logsToRender.length);
 }
 
-
-function orderBy() {
-
+function orderBy(col, ordDirection) {
+    filteredLogs = orderByCol(allLogs, col.Name, ordDirection)
+    currentPage = 1;
+    renderTable(filteredLogs);
 }
 
 function renderPaginationControls(totalLogsCount) {
@@ -97,7 +143,7 @@ function renderPaginationControls(totalLogsCount) {
         pageSpan.classList.add('page-number');
 
         if (i === currentPage) {
-            pageSpan.classList.add('active');
+            pageSpan.classList.add('active', 'active-page');
         }
 
         pageSpan.addEventListener('click', () => {
@@ -134,10 +180,10 @@ document.addEventListener('DOMContentLoaded', () => {
 });
 
 function showSpinner() { loadingSpinner.classList.add('active'); }
-
 function hideSpinner() { loadingSpinner.classList.remove('active'); }
 
 function getLogs() {
+
     fetch('/api/logs')
         .then(response => {
             if (!response.ok) {
@@ -148,28 +194,45 @@ function getLogs() {
             return response.json();
         })
         .then(data => {
+
+
             hideSpinner();
             resetVisibilityHtmlElements()
-            allData = data;
             allLogs = data.logs || [];
             allCols = data.cols || [];
-            console.log(data)
 
             if (allLogs.length === 0) {
-                outputDiv.innerText = "No log founds. file can be empty or not parsable.";
+                const resultDialog = new DialogComponent({
+                    title: "Attention!",
+                    content: "No log founds. file can be empty or not parsable.",
+                    onClose: () => { }
+                });
+                resultDialog.open();
                 logTableRows.innerHTML = '<tr><td colspan="' + allCols.length + '">No logs available.</td></tr>';
             } else {
                 filteredLogs = [...allLogs];
                 renderColumns(allCols);
                 renderTable(filteredLogs);
-                outputDiv.innerText = "Logs loaded.";
+
+                const resultDialog = new DialogComponent({
+                    title: "Success!",
+                    content: "Logs loaded",
+                    onClose: () => { }
+                });
+                resultDialog.open();
+
             }
         })
         .catch(error => {
             hideSpinner();
             resetVisibilityHtmlElements()
             console.error('Error in loading Logs:', error);
-            outputDiv.innerText = 'Errore nel caricamento dei log: ' + error.message;
+            const resultDialog = new DialogComponent({
+                title: "Error!",
+                content: 'Errore nel caricamento dei log: ' + error.message,
+                onClose: () => { }
+            });
+            resultDialog.open();
         })
         .finally(() => {
             hideSpinner();
