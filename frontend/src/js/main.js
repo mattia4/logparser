@@ -1,4 +1,4 @@
-import { highlightText, filterArrayBySearchTerm, filterByColumns, orderByCol } from './table-functions.js';
+import { highlightText, filterArrayBySearchTerm, filterByColumns, orderByCol, cleanString } from './table-functions.js';
 import { hideHtmlElement, resetVisibilityHtmlElements, DivHelper } from './helpers.js';
 import { exportTableToPdf } from './pdf-utils.js';
 import { DialogComponent } from './dialog.js'
@@ -96,6 +96,8 @@ function renderTable(logsToRender) {
             const td = document.createElement('td');
             const p = document.createElement('p');
 
+            p.classList.add('col-p-style')
+
             const rowVal = DivHelper.makeRow("", {});
             const rowActions = DivHelper.makeRow("", {});
             const colActionSeeMore = DivHelper.makeCol("see more...", { class: 'see-more' });
@@ -106,18 +108,22 @@ function renderTable(logsToRender) {
                 p.innerText = logEntry[colDef.Name] !== undefined ? logEntry[colDef.Name] : '';
             }
 
-            colActionSeeMore.addEventListener('click', () => {
-                const resultDialog = new DialogComponent({
-                    title: colDef.DisplayName,
-                    content: p.innerHTML,
-                    onClose: () => { }
+            if (cleanString(p.innerText).length != 0) {
+                colActionSeeMore.addEventListener('click', () => {
+                    const resultDialog = new DialogComponent({
+                        title: colDef.DisplayName,
+                        content: p.innerHTML,
+                        onClose: () => { }
+                    });
+                    resultDialog.open();
                 });
-                resultDialog.open();
-            });
+            }
 
             rowVal.appendChild(p)
             td.appendChild(rowVal);
-            rowActions.appendChild(colActionSeeMore);
+            if (cleanString(p.innerText).length != 0) {
+                rowActions.appendChild(colActionSeeMore);
+            }
             td.appendChild(rowActions);
             tr.appendChild(td);
         });
