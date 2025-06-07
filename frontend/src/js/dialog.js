@@ -25,6 +25,7 @@ export class DialogComponent {
         contentDiv.appendChild(titleElement);
 
         const contentParagraph = document.createElement('p');
+        contentParagraph.classList.add('dialog-p-style');
         contentParagraph.innerHTML = this.options.content;
         contentDiv.appendChild(contentParagraph);
 

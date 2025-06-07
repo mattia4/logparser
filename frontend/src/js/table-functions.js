@@ -22,18 +22,38 @@ export function filterByColumns(columnName, logs, searchInput) {
 
 }
 
-function cleanString(str) {
+export function cleanString(str) {
     return str.replace(/\s/g, '').replace(/\u00A0/g, '');
 }
 
 export function orderByCol(logs, columnName, isAscending = true) {
     logs.sort((a, b) => {
-        const valA = a[columnName];
-        const valB = b[columnName];
 
         let comparison = 0;
+        const valueA = a[columnName];
+        const valueB = b[columnName];
 
-        comparison = String(valA).localeCompare(String(valB));
+        const numA = Number(valueA);
+        const numB = Number(valueB);
+
+        const isANumber = !isNaN(numA);
+        const isBNumber = !isNaN(numB);
+
+        if (isANumber && isBNumber) {
+            comparison = numA - numB;
+        }
+        else if (isANumber && !isBNumber) {
+            comparison = -1;
+        }
+        else if (!isANumber && isBNumber) {
+            comparison = 1;
+        }
+        else {
+            const strA = String(valueA || '').trim().toLowerCase();
+            const strB = String(valueB || '').trim().toLowerCase();
+
+            comparison = strA.localeCompare(strB);
+        }
 
         return isAscending ? comparison : -comparison;
     });
