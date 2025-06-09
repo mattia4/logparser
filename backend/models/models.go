@@ -1,4 +1,8 @@
-package api
+package backend
+
+import (
+	"fmt"
+)
 
 type LogEntryAPI struct {
 	RawLine string `json:"RawLine"`
@@ -55,3 +59,5 @@ type LogDataResponse struct {
 	Logs []LogEntryAPI    `json:"logs"`
 	Cols []ColTemplateAPI `json:"cols"`
 }
+
+func ApiError(format string, a ...any) error { return fmt.Errorf(format, a...) }
