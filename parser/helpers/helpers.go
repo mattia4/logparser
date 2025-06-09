@@ -2,13 +2,13 @@ package helpers
 
 import (
 	"fmt"
-	api "logparser/api"
+	lbm "logparser/backend/models"
 	m "logparser/parser/models"
 )
 
 func HandleParseDataColumnMondel(parsedEntry m.LogResult, errorHandler func(err error)) []string {
 	var orderedColNames []string
-	allParsedColsMap := make(map[string]api.ColTemplateAPI)
+	allParsedColsMap := make(map[string]lbm.ColTemplateAPI)
 
 	switch v := parsedEntry.ParsedData.(type) {
 	case m.OpLogEntry:
@@ -67,8 +67,8 @@ func HandleParseDataColumnMondel(parsedEntry m.LogResult, errorHandler func(err 
 	return orderedColNames
 }
 
-func HandleParseDataModel(parsedEntry m.LogResult, errorHandler func(err error)) api.LogEntryAPI {
-	apiEntry := api.LogEntryAPI{
+func HandleParseDataModel(parsedEntry m.LogResult, errorHandler func(err error)) lbm.LogEntryAPI {
+	apiEntry := lbm.LogEntryAPI{
 		RawLine: parsedEntry.RawLine,
 		LogType: parsedEntry.FormatTag,
 	}
@@ -145,15 +145,15 @@ func HandleParseDataModel(parsedEntry m.LogResult, errorHandler func(err error))
 	return apiEntry
 }
 
-func AddColDefinition(name string, displayName string, allParsedColsMap map[string]api.ColTemplateAPI, orderedColNames []string) []string {
+func AddColDefinition(name string, displayName string, allParsedColsMap map[string]lbm.ColTemplateAPI, orderedColNames []string) []string {
 	if _, exists := allParsedColsMap[name]; !exists {
-		allParsedColsMap[name] = api.ColTemplateAPI{Name: name, DisplayName: displayName}
+		allParsedColsMap[name] = lbm.ColTemplateAPI{Name: name, DisplayName: displayName}
 		orderedColNames = append(orderedColNames, name)
 	}
 	return orderedColNames
 }
 
-func AddDefaultColumns(allParsedColsMap map[string]api.ColTemplateAPI, orderedColNames []string) []string {
+func AddDefaultColumns(allParsedColsMap map[string]lbm.ColTemplateAPI, orderedColNames []string) []string {
 	orderedColNames = AddColDefinition("LogType", "Tipo Log", allParsedColsMap, orderedColNames)
 	orderedColNames = AddColDefinition("RawLine", "Raw", allParsedColsMap, orderedColNames)
 	orderedColNames = AddColDefinition("StatusCode", "Status Code", allParsedColsMap, orderedColNames)

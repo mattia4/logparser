@@ -3,7 +3,7 @@ package parser
 import (
 	"bufio"
 	"fmt"
-	"logparser/api"
+	lbm "logparser/backend/models"
 	logger "logparser/logger"
 	help "logparser/parser/helpers"
 	m "logparser/parser/models"
@@ -22,7 +22,7 @@ func ParseLogLine(line string, parsers []m.LogParser) m.LogResult {
 	return m.LogResult{RawLine: line, FormatTag: "Unrecognized"}
 }
 
-func ParseLogFileOrError(filePath string, registeredParser []m.LogParser, errorHandler func(err error)) ([]api.LogEntryAPI, []api.ColTemplateAPI) {
+func ParseLogFileOrError(filePath string, registeredParser []m.LogParser, errorHandler func(err error)) ([]lbm.LogEntryAPI, []lbm.ColTemplateAPI) {
 	logger := logger.NewLogger(true)
 
 	file := fu.Open(filePath)
@@ -30,9 +30,9 @@ func ParseLogFileOrError(filePath string, registeredParser []m.LogParser, errorH
 
 	scanner := bufio.NewScanner(file)
 
-	var apiEntries []api.LogEntryAPI
+	var apiEntries []lbm.LogEntryAPI
 
-	allParsedColsMap := make(map[string]api.ColTemplateAPI)
+	allParsedColsMap := make(map[string]lbm.ColTemplateAPI)
 	var orderedColNames []string
 
 	//orderedColNames = help.AddDefaultColumns(allParsedColsMap, orderedColNames)
@@ -44,11 +44,11 @@ func ParseLogFileOrError(filePath string, registeredParser []m.LogParser, errorH
 
 		// TODO if row not recognized then print into file or put in other fields
 		if parsedEntry.ParsedData == nil {
-			errorHandler(fmt.Errorf("parsers have no clue of waht this row is: %s", line))
+			errorHandler(fmt.Errorf("parsers have no clue of what this row is: %s", line))
 			continue
 		}
 
-		apiEntry := api.LogEntryAPI{}
+		apiEntry := lbm.LogEntryAPI{}
 
 		apiEntry = help.HandleParseDataModel(parsedEntry, func(err error) {
 			logger.Info("%s", err)
@@ -74,7 +74,7 @@ func ParseLogFileOrError(filePath string, registeredParser []m.LogParser, errorH
 		errorHandler(fmt.Errorf("error while scanning file: %w", err))
 	}
 
-	var finalCols []api.ColTemplateAPI
+	var finalCols []lbm.ColTemplateAPI
 	for _, name := range orderedColNames {
 		finalCols = append(finalCols, allParsedColsMap[name])
 	}
