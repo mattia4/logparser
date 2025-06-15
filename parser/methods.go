@@ -10,16 +10,15 @@ import (
 	fu "logparser/utils/file"
 )
 
-func ParseLogLine(line string, parsers []m.LogParser) m.LogResult {
+func ParseLogLine(rowIdx int, line string, parsers []m.LogParser) m.LogResult {
 	for _, p := range parsers {
 		matches := p.Regex.FindStringSubmatch(line)
 
 		if len(matches) > 0 {
-			return p.ParseFn(matches, line)
+			return p.ParseFn(rowIdx, matches, line)
 		}
-
 	}
-	return m.LogResult{RawLine: line, FormatTag: "Unrecognized"}
+	return m.LogResult{Id: 0, RawLine: line, FormatTag: "Unrecognized"}
 }
 
 func ParseLogFileOrError(filePath string, registeredParser []m.LogParser, errorHandler func(err error)) ([]lbm.LogEntryAPI, []lbm.ColTemplateAPI) {
@@ -37,10 +36,12 @@ func ParseLogFileOrError(filePath string, registeredParser []m.LogParser, errorH
 
 	//orderedColNames = help.AddDefaultColumns(allParsedColsMap, orderedColNames)
 
+	rowIdx := 0
 	for scanner.Scan() {
 		line := scanner.Text()
 
-		parsedEntry := ParseLogLine(line, registeredParser)
+		parsedEntry := ParseLogLine(rowIdx, line, registeredParser)
+		rowIdx++
 
 		// TODO if row not recognized then print into file or put in other fields
 		if parsedEntry.ParsedData == nil {
@@ -59,7 +60,7 @@ func ParseLogFileOrError(filePath string, registeredParser []m.LogParser, errorH
 		//})
 		//
 		//fmt.Println(additionalCols)
-
+		apiEntry.Id = parsedEntry.Id
 		apiEntry.RawLine = parsedEntry.RawLine
 		apiEntry.LogType = parsedEntry.FormatTag
 

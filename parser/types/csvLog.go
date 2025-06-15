@@ -13,7 +13,7 @@ var reCsv = regexp.MustCompile(logRegexCsv)
 var logParserCsv = m.LogParser{
 	Name:  tagCsv,
 	Regex: reCsv,
-	ParseFn: func(matches []string, rawLine string) m.LogResult {
+	ParseFn: func(id int, matches []string, rawLine string) m.LogResult {
 		parsedMap := make(map[string]string)
 		for i, name := range reCsv.SubexpNames() {
 			if i != 0 && name != "" {
@@ -36,6 +36,7 @@ var logParserCsv = m.LogParser{
 		}
 
 		return m.LogResult{
+			Id:         id,
 			RawLine:    rawLine,
 			FormatTag:  tagCsv,
 			ParsedData: entry,

@@ -13,7 +13,7 @@ var reDBLog = regexp.MustCompile(logRegexDBLog)
 var logParserDBLog = m.LogParser{
 	Name:  tagDBLog,
 	Regex: reDBLog,
-	ParseFn: func(matches []string, rawLine string) m.LogResult {
+	ParseFn: func(id int, matches []string, rawLine string) m.LogResult {
 		parsedMap := make(map[string]string)
 		for i, name := range reDBLog.SubexpNames() {
 			if i != 0 && name != "" {
@@ -39,6 +39,7 @@ var logParserDBLog = m.LogParser{
 		}
 
 		return m.LogResult{
+			Id:         id,
 			RawLine:    rawLine,
 			FormatTag:  tagDBLog,
 			ParsedData: entry,

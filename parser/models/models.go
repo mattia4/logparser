@@ -99,6 +99,7 @@ type DatabaseLogEntry struct {
 }
 
 type LogResult struct {
+	Id         int
 	RawLine    string
 	FormatTag  string
 	ParsedData interface{}
@@ -106,8 +107,14 @@ type LogResult struct {
 }
 
 type ColTemplate struct {
-	Name  string
-	Value string
+	Name        string
+	Value       string
+	PdfColProps PdfColProps
+}
+
+type PdfColProps struct {
+	MaxWidth  int
+	MaxHeight int
 }
 
 type Result struct {
@@ -118,7 +125,7 @@ type Result struct {
 type LogParser struct {
 	Name    string
 	Regex   *regexp.Regexp
-	ParseFn func(matches []string, rawLine string) LogResult
+	ParseFn func(id int, matches []string, rawLine string) LogResult
 }
 
 var RegisteredParsers []LogParser

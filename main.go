@@ -41,9 +41,6 @@ func main() {
 		Logs: parsedApiEntries,
 		Cols: finalCols,
 	}
-
-	//httpu.ServerHttpConf(frontendFiles, globalLogData, logger)
-
 	logHandler := api.NewLogAPIHandler(globalLogData, func(err error) {
 		logger.Error("Error in LogAPIHandler: %v", err)
 	})

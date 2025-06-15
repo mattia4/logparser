@@ -13,7 +13,7 @@ var reRfc3164Basic = regexp.MustCompile(logRfc3164Basic)
 var logParserRfc3164Basic = m.LogParser{
 	Name:  tagRfc3164Basic,
 	Regex: reRfc3164Basic,
-	ParseFn: func(matches []string, rawLine string) m.LogResult {
+	ParseFn: func(id int, matches []string, rawLine string) m.LogResult {
 		parsedMap := make(map[string]string)
 		for i, name := range reSyslog.SubexpNames() {
 			if i != 0 && name != "" {
@@ -41,6 +41,7 @@ var logParserRfc3164Basic = m.LogParser{
 		}
 
 		return m.LogResult{
+			Id:         id,
 			RawLine:    rawLine,
 			FormatTag:  tagSyslog,
 			ParsedData: entry,

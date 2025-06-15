@@ -89,8 +89,25 @@ function renderTable(logsToRender) {
 
     logTableRows.innerHTML = '';
 
-    paginatedLogs.forEach(logEntry => {
+    paginatedLogs.forEach((logEntry, idx) => {
         const tr = document.createElement('tr');
+        tr.id = logEntry.Id;
+
+        if (idx % 2 == 0) {
+            tr.classList.add('row-color-blue');
+        } else {
+            tr.classList.add('row-color-light-white');
+        }
+
+        tr.addEventListener('click', () => {
+            if (!tr.classList.contains('row-selected')) {
+                tr.classList.remove(idx % 2 == 0 ? 'row-color-blue' : 'row-color-light-white');
+                tr.classList.add('row-selected');
+            } else {
+                tr.classList.remove('row-selected');
+                tr.classList.add(idx % 2 == 0 ? 'row-color-blue' : 'row-color-light-white');
+            }
+        });
 
         allCols.forEach(colDef => {
             const td = document.createElement('td');
@@ -99,8 +116,8 @@ function renderTable(logsToRender) {
             p.classList.add('col-p-style')
 
             const rowVal = DivHelper.makeRow("", {});
-            const rowActions = DivHelper.makeRow("", {});
-            const colActionSeeMore = DivHelper.makeCol("see more...", { class: 'see-more' });
+            const rowActions = DivHelper.makeRow("", { class: 'justify-content-end' });
+            const colActionSeeMore = DivHelper.makeCol("see more...", { class: 'col-auto see-more' });
 
             if (searchInput != null && searchInput.value.length != 0) {
                 p.innerHTML = logEntry[colDef.Name] !== undefined ? highlightText(logEntry[colDef.Name], searchInput.value) : '';
@@ -182,7 +199,13 @@ document.addEventListener('DOMContentLoaded', () => {
     searchInput.addEventListener('keyup', filterByUserSearch);
     prevPageBtn.addEventListener('click', () => changePage(-1));
     nextPageBtn.addEventListener('click', () => changePage(1));
-    btnExportPdf.addEventListener('click', () => exportTableToPdf(allCols, filteredLogs));
+    btnExportPdf.addEventListener('click', () => {
+
+        let allSelectedRows = document.querySelectorAll('.row-selected');
+        const selectedRowValues = Array.from(allSelectedRows, element => Number(element.id.trim()));
+        let logsToExport = filteredLogs.filter((x) => selectedRowValues.includes(x.Id));
+        exportTableToPdf(allCols, logsToExport);
+    });
 });
 
 function showSpinner() { loadingSpinner.classList.add('active'); }
@@ -209,7 +232,7 @@ function getLogs() {
 
             if (allLogs.length === 0) {
                 const resultDialog = new DialogComponent({
-                    title: "Attention!",
+                    title: "Warning!",
                     content: "No log founds. file can be empty or not parsable.",
                     onClose: () => { }
                 });

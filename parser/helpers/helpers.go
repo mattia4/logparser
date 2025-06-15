@@ -69,6 +69,7 @@ func HandleParseDataColumnMondel(parsedEntry m.LogResult, errorHandler func(err 
 
 func HandleParseDataModel(parsedEntry m.LogResult, errorHandler func(err error)) lbm.LogEntryAPI {
 	apiEntry := lbm.LogEntryAPI{
+		Id:      parsedEntry.Id,
 		RawLine: parsedEntry.RawLine,
 		LogType: parsedEntry.FormatTag,
 	}
