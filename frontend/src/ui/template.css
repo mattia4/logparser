@@ -115,7 +115,7 @@
             border-right: none;
         }
 
-        .active-page{
+        .active-page {
             color: white !important;
             padding: 5px;
             border: 1px solid cornflowerblue;
@@ -129,12 +129,7 @@
         }
 
         #logTable tbody tr {
-            background-color: #ffffff;
             transition: background-color 0.15s ease-in-out;
-        }
-
-        #logTable tbody tr:nth-child(even) {
-            background-color: #f8fafc;
         }
 
         .see-more {
@@ -147,6 +142,18 @@
             color: #0ea5e9;
         }
 
+        .row-selected {
+            background-color: #0ea5e9;
+        }
+
+        .row-color-blue {
+            background-color: #9fd3ebf1;
+        }
+
+        .row-color-light-white {
+            background-color: #c6e3f0f1;
+        }
+
         .col-p-style {
             white-space: nowrap;
             overflow: hidden;
@@ -154,10 +161,6 @@
             text-align: center;
             align-content: center;
             height: 50px;
-        }
-
-        #logTable tbody tr:hover {
-            background-color: #e0f2fe;
         }
 
         #logTable td {

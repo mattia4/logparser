@@ -13,7 +13,7 @@ var reCustomApp = regexp.MustCompile(logRegexCustomApp)
 var logParserCustomApp = m.LogParser{
 	Name:  tagCustomApp,
 	Regex: reCustomApp,
-	ParseFn: func(matches []string, rawLine string) m.LogResult {
+	ParseFn: func(id int, matches []string, rawLine string) m.LogResult {
 		parsedMap := make(map[string]string)
 		for i, name := range reCustomApp.SubexpNames() {
 			if i != 0 && name != "" {
@@ -37,6 +37,7 @@ var logParserCustomApp = m.LogParser{
 		}
 
 		return m.LogResult{
+			Id:         id,
 			RawLine:    rawLine,
 			FormatTag:  tagCustomApp,
 			ParsedData: entry,

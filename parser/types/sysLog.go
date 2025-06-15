@@ -13,7 +13,7 @@ var reSyslog = regexp.MustCompile(logRegexSyslog)
 var logParserSyslog = m.LogParser{
 	Name:  tagSyslog,
 	Regex: reSyslog,
-	ParseFn: func(matches []string, rawLine string) m.LogResult {
+	ParseFn: func(id int, matches []string, rawLine string) m.LogResult {
 		parsedMap := make(map[string]string)
 		for i, name := range reSyslog.SubexpNames() {
 			if i != 0 && name != "" {
@@ -41,6 +41,7 @@ var logParserSyslog = m.LogParser{
 		}
 
 		return m.LogResult{
+			Id:         id,
 			RawLine:    rawLine,
 			FormatTag:  tagSyslog,
 			ParsedData: entry,

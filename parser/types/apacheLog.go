@@ -14,7 +14,7 @@ var reApache = regexp.MustCompile(logRegexApache)
 var logParserApache = m.LogParser{
 	Name:  tagApache,
 	Regex: reApache,
-	ParseFn: func(matches []string, rawLine string) m.LogResult {
+	ParseFn: func(id int, matches []string, rawLine string) m.LogResult {
 		parsedMap := make(map[string]string)
 		for i, name := range reApache.SubexpNames() {
 			if i != 0 && name != "" {
@@ -42,6 +42,7 @@ var logParserApache = m.LogParser{
 		}
 
 		return m.LogResult{
+			Id:         id,
 			RawLine:    rawLine,
 			FormatTag:  tagApache,
 			ParsedData: entry,

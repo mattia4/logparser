@@ -13,7 +13,7 @@ var reCombinedApache = regexp.MustCompile(logRegexCombinedApache)
 var logParserCombinedApache = m.LogParser{
 	Name:  tagCombinedApache,
 	Regex: reCombinedApache,
-	ParseFn: func(matches []string, rawLine string) m.LogResult {
+	ParseFn: func(id int, matches []string, rawLine string) m.LogResult {
 		parsedMap := make(map[string]string)
 		for i, name := range reCombinedApache.SubexpNames() {
 			if i != 0 && name != "" {
@@ -48,6 +48,7 @@ var logParserCombinedApache = m.LogParser{
 		}
 
 		return m.LogResult{
+			Id:         id,
 			RawLine:    rawLine,
 			FormatTag:  tagCombinedApache,
 			ParsedData: entry,

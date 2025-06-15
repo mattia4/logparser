@@ -5,6 +5,7 @@ import (
 )
 
 type LogEntryAPI struct {
+	Id      int    `json:"Id"`
 	RawLine string `json:"RawLine"`
 	LogType string `json:"LogType"`
 

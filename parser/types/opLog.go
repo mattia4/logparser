@@ -16,7 +16,7 @@ var reOp = regexp.MustCompile(logRegexOp)
 var logParserOp = m.LogParser{
 	Name:  tagOp,
 	Regex: reOp,
-	ParseFn: func(matches []string, rawLine string) m.LogResult {
+	ParseFn: func(id int, matches []string, rawLine string) m.LogResult {
 		parsedMap := make(map[string]string)
 		for i, name := range reOp.SubexpNames() {
 			if i != 0 && name != "" {
@@ -58,6 +58,7 @@ var logParserOp = m.LogParser{
 		}
 
 		return m.LogResult{
+			Id:         id,
 			RawLine:    rawLine,
 			FormatTag:  tagOp,
 			ParsedData: accessLogEntry,

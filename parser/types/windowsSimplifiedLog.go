@@ -13,7 +13,7 @@ var reWindows = regexp.MustCompile(logRegexWindows)
 var logParserWindows = m.LogParser{
 	Name:  tagWindows,
 	Regex: reWindows,
-	ParseFn: func(matches []string, rawLine string) m.LogResult {
+	ParseFn: func(id int, matches []string, rawLine string) m.LogResult {
 		parsedMap := make(map[string]string)
 		for i, name := range reWindows.SubexpNames() {
 			if i != 0 && name != "" {
@@ -41,6 +41,7 @@ var logParserWindows = m.LogParser{
 		}
 
 		return m.LogResult{
+			Id:         id,
 			RawLine:    rawLine,
 			FormatTag:  tagWindows,
 			ParsedData: entry,
