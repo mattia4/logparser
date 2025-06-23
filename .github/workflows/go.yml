@@ -21,7 +21,7 @@ jobs:
         go-version: '1.24'
 
     - name: Build
-      run: go build -v ./logparser
+      run: go build -v ./
 
     - name: Upload build artifact
       uses: actions/upload-artifact@v4
